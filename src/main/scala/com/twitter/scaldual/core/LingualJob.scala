@@ -149,7 +149,6 @@ abstract class LingualJob(args:Args) extends Job(args) {
     val statsData = cascade.getCascadeStats
     handleStats(statsData)
     statsData.isSuccessful
-    true
   }
 
   def catalog(catalog:LingualCatalog) { catalogs += catalog}

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# “a” and “arga” have optional arguments with default values.
+# “b” and “argb” have no arguments, acting as sort of a flag.
+# “c” and “argc” have required arguments.
+
+# set an initial value for the flag
+ARG_DELIM='\t'
+ARG_REDUCERS='20'
+
+pushd `dirname $0` > /dev/null
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+popd > /dev/null
+
+SCRIPT=`basename ${BASH_SOURCE[0]}`
+
+NORM=`tput sgr0`
+BOLD=`tput bold`
+REV=`tput smso`
+
+#Help function
+function HELP {
+  echo -e \\n"Help documentation for ${BOLD}${SCRIPT}.${NORM}"\\n
+  echo -e "${REV}Basic usage:${NORM} ${BOLD}$SCRIPT tql${NORM}"\\n
+  echo -e "The following arguments are required"\\n
+  echo -e "${REV}-q${NORM}  --Sets the query for the job"\\n
+  echo -e "${REV}-o${NORM}  --Sets the output file for the job, this will be in TSV form"\\n
+  echo -e "${REV}-i${NORM}  --Sets the input file for the job"\\n
+  echo -e "The following arguments are optional"\\n
+  echo -e "${REV}-l${NORM}  --Sets if the option for this script to be run in local mode for scalding"\\n
+  echo -e "${REV}-r${NORM}  --Sets the number of reducers"\\n
+  echo -e "-----------------------------------"\\n
+  echo -e "${REV}-h${NORM}  --Displays this help message. No further functions are performed."\\n
+  echo -e "Example: ${BOLD}$SCRIPT -l -i src/main/resources/tutorial/docBOW.tsv -o /tmp/output.tsv -q '\"select B, count(distinct A) as cnt from FILE group by B\"'${NORM}"\\n
+  exit 1
+}
+
+#Check the number of arguments. If none are passed, print help and exit.
+NUMARGS=$#
+if [ $NUMARGS -eq 0 ]; then
+  HELP
+fi
+
+cmd=""
+
+while getopts :i:o:lq:d:h FLAG; do
+  case $FLAG in
+    i)
+      ARG_INPUT=$OPTARG
+      cmd="--input $OPTARG $cmd"
+      ;;
+    o)
+      ARG_OUTPUT=$OPTARG
+      cmd="--output $OPTARG $cmd"
+      ;;
+    q)
+      ARG_QUERY=$OPTARG
+      cmd="--query '"$OPTARG"' $cmd"
+      ;;
+    l)
+      ARG_LOCAL=1
+      ;;
+    r)
+      ARG_REDUCERS=$OPTARG
+      ;;
+    d)
+      ARG_DELIM=$OPTARG
+      cmd="--delim $OPTARG $cmd"
+      ;;
+    h)
+      HELP
+      ;;
+    \?)
+      echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
+      HELP
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
+
+if [[ -z "$ARG_INPUT" ]] || [[ -z "$ARG_OUTPUT" ]] || [[ -z "$ARG_QUERY" ]] ; then
+  HELP;
+fi
+
+runner=""
+if [[ -z "$ARG_LOCAL" ]] ; then
+  runner="$runner --hdfs"
+else  
+  runner="$runner --local"
+fi
+
+full_cmd="$SCRIPTPATH/scaldual.rb --jar $SCRIPTPATH/../target/scala-2.10/scaldual-assembly-0.1-SNAPSHOT.jar --reducers $ARG_REDUCERS $runner com.twitter.scaldual.tsql.TSqlJob $cmd"
+echo "Running $full_cmd"
+$full_cmd

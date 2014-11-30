@@ -85,12 +85,6 @@ OPTS_PARSER = Trollop::Parser.new do
   opt :jar, "Specify the jar file", :type => String
   opt :host, "Specify the hadoop host where the job runs", :type => String
   opt :reducers, "Specify the number of reducers", :type => :int
-  opt :avro, "Add scalding-avro to classpath"
-  opt :commons, "Add scalding-commons to classpath"
-  opt :jdbc, "Add scalding-jdbc to classpath"
-  opt :json, "Add scalding-json to classpath"
-  opt :parquet, "Add scalding-parquet to classpath"
-  opt :repl, "Add scalding-repl to classpath"
   opt :tool, "The scalding main class, defaults to com.twitter.scalding.Tool", :type => String
 
   stop_on_unknown #Stop parsing for options parameters once we reach the job file.
@@ -233,8 +227,7 @@ end
 JARFILE =
   if OPTS[:jar]
     jarname = OPTS[:jar]
-    #highly Twitter specific here:
-    CONFIG["repo_root"] + "/dist/#{jarname}-deploy.jar"
+    "#{jarname}"
   else
     CONFIG["jar"]
   end
@@ -492,8 +485,10 @@ def hadoop_command
     JOB_ARGS
 end
 
+puts hadoop_opts
+
 def jar_mode_command
-  "HADOOP_CLASSPATH=#{JARBASE} hadoop jar #{JARBASE} #{hadoop_opts} #{JOB} --hdfs " + JOB_ARGS
+  "hadoop jar #{JARBASE} #{TOOL} #{hadoop_opts} #{JOB} --hdfs " + JOB_ARGS
 end
 
 #Always sync the remote JARFILE

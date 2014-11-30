@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.twitter.scadual.tutorial
+package com.twitter.scadual.tsql
 
-import cascading.flow.FlowDef
 import cascading.tuple.Fields
 import com.twitter.scalding._
 import com.twitter.scaldual.tutorial.LocalTableFunction
@@ -25,35 +24,23 @@ import org.specs.mock.Mockito
 
 object TestData {
   val path = "src/main/resources/tutorial/docBOW.tsv"
-  val input = Tsv(path, fields = new Fields("doc_id", "word", "count"))
+  val input = Tsv(path, fields = new Fields("A", "B", "C"))
   val data = List((1, "The", 5), (2, "Dog", 12), (3, "Car", 15))
+  val inputLine = TypedPsv[String](path)
+  val dataLine = List("1\tThe\t5", "2\tDog\t12", "3\tCar\t15")
 }
-class LingualTutorialTest extends Specification with Mockito { 
-  implicit val flowDef = mock[FlowDef]
-   
+class TsqlTest extends Specification with Mockito {
   import TestData._
-  "A Simple Tutorial" should {     
-    JobTest("com.twitter.scaldual.tutorial.LingualLocal").
+  "A TSQL Class" should {
+    JobTest(new com.twitter.scaldual.tsql.TSqlJob(_)).
       arg("output", "outputFile").
+      arg("input", path).
+      arg("query", """select A, B from FILE""").
       source(input, data).
-      sink[(String, Int)](Tsv("outputFile")){ outputBuffer =>
+      source(inputLine, dataLine).
+      sink[(String, String)](Tsv("outputFile")){ outputBuffer =>
         "correcly output data" in {
           outputBuffer.size must beEqualTo(3)
-        }
-      }.
-      run.
-      finish
-  }
-  
-  "A Tabled Tutorial" should {     
-    val table = LocalTableFunction()
-    JobTest("com.twitter.scaldual.tutorial.LingualTableLocalFunction").
-      arg("output", "outputFile").
-      source(table.source, data).
-      source(table.tmpFile, data.map(table.function(_))).
-      sink[(String, Int)](Tsv("outputFile")){ outputBuffer =>
-        "correcly output data" in {
-          outputBuffer.size must be_>=(0)
         }
       }.
       run.
