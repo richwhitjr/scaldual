@@ -28,6 +28,20 @@ class TSqlJob(args:Args) extends LingualJob(args){
   val columnNames = 0.to(columns-1).map(v => Character.toUpperCase(Character.forDigit(v+10,36)).toString)
   
   table("FILE", Tsv(input, fields = new Fields(columnNames:_*)))
-  output(Tsv(args("output")))
+
+  val outputFile = args("output")
+  output(Tsv(outputFile))
+
   override def query = args("query")
+
+  override def cascadeComplete(): Unit = {
+    val headOpt = args.optional("head")
+    if(headOpt.isDefined){
+      println("Writing first %s lines:".format(headOpt.get))
+      TypedPsv[String](outputFile)
+        .toIterator
+        .take(headOpt.get.toInt)
+        .foreach(println)
+    }
+  }
 }

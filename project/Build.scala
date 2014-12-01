@@ -7,7 +7,7 @@ import AssemblyKeys._
 
 import scala.collection.JavaConverters._
 
-object ScaldingBuild extends Build {
+object ScadualBuild extends Build {
   val printDependencyClasspath = taskKey[Unit]("Prints location of the dependencies")
   
   val sharedSettings = Project.defaultSettings ++ net.virtualvoid.sbt.graph.Plugin.graphSettings ++ assemblySettings ++ Seq(

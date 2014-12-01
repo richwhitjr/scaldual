@@ -485,8 +485,6 @@ def hadoop_command
     JOB_ARGS
 end
 
-puts hadoop_opts
-
 def jar_mode_command
   "hadoop jar #{JARBASE} #{TOOL} #{hadoop_opts} #{JOB} --hdfs " + JOB_ARGS
 end

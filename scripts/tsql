@@ -30,6 +30,7 @@ function HELP {
   echo -e "The following arguments are optional"\\n
   echo -e "${REV}-l${NORM}  --Sets if the option for this script to be run in local mode for scalding"\\n
   echo -e "${REV}-r${NORM}  --Sets the number of reducers"\\n
+  echo -e "${REV}-n${NORM}  --Sets if we should output the first n lines to stdout"\\n
   echo -e "-----------------------------------"\\n
   echo -e "${REV}-h${NORM}  --Displays this help message. No further functions are performed."\\n
   echo -e "Example: ${BOLD}$SCRIPT -l -i src/main/resources/tutorial/docBOW.tsv -o /tmp/output.tsv -q '\"select B, count(distinct A) as cnt from FILE group by B\"'${NORM}"\\n
@@ -44,7 +45,7 @@ fi
 
 cmd=""
 
-while getopts :i:o:lq:d:h FLAG; do
+while getopts :i:o:lr::n::q:d:h FLAG; do
   case $FLAG in
     i)
       ARG_INPUT=$OPTARG
@@ -63,6 +64,10 @@ while getopts :i:o:lq:d:h FLAG; do
       ;;
     r)
       ARG_REDUCERS=$OPTARG
+      ;;
+    n)
+      ARG_HEAD=$OPTARG
+      cmd="--head '"$OPTARG"' $cmd"
       ;;
     d)
       ARG_DELIM=$OPTARG
