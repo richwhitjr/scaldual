@@ -7,11 +7,15 @@
 # set an initial value for the flag
 ARG_DELIM='\t'
 ARG_REDUCERS='20'
+ARG_HOST=''
 
-pushd `dirname $0` > /dev/null
-
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-popd > /dev/null
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPTPATH="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 SCRIPT=`basename ${BASH_SOURCE[0]}`
 
@@ -31,6 +35,7 @@ function HELP {
   echo -e "${REV}-l${NORM}  --Sets if the option for this script to be run in local mode for scalding"\\n
   echo -e "${REV}-r${NORM}  --Sets the number of reducers"\\n
   echo -e "${REV}-n${NORM}  --Sets if we should output the first n lines to stdout"\\n
+  echo -e "${REV}-s${NORM}  --Sets the host for hdfs jobs"\\n
   echo -e "-----------------------------------"\\n
   echo -e "${REV}-h${NORM}  --Displays this help message. No further functions are performed."\\n
   echo -e "Example: ${BOLD}$SCRIPT -l -i src/main/resources/tutorial/docBOW.tsv -o /tmp/output.tsv -q '\"select B, count(distinct A) as cnt from FILE group by B\"'${NORM}"\\n
@@ -45,7 +50,7 @@ fi
 
 cmd=""
 
-while getopts :i:o:lr::n::q:d:h FLAG; do
+while getopts :i:o:lr::n::q:s:d:h FLAG; do
   case $FLAG in
     i)
       ARG_INPUT=$OPTARG
@@ -64,6 +69,9 @@ while getopts :i:o:lr::n::q:d:h FLAG; do
       ;;
     r)
       ARG_REDUCERS=$OPTARG
+      ;;
+    s)
+      ARG_HOST=$OPTARG
       ;;
     n)
       ARG_HEAD=$OPTARG
@@ -94,6 +102,10 @@ if [[ -z "$ARG_LOCAL" ]] ; then
   runner="$runner --hdfs"
 else  
   runner="$runner --local"
+fi
+
+if [ -n "$ARG_HOST" ]; then 
+  runner="$runner --host $ARG_HOST"
 fi
 
 full_cmd="$SCRIPTPATH/scaldual.rb --jar $SCRIPTPATH/../target/scala-2.10/scaldual-assembly-0.1-SNAPSHOT.jar --reducers $ARG_REDUCERS $runner com.twitter.scaldual.tsql.TSqlJob $cmd"
