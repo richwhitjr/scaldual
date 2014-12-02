@@ -26,7 +26,7 @@ REV=`tput smso`
 #Help function
 function HELP {
   echo -e \\n"Help documentation for ${BOLD}${SCRIPT}.${NORM}"\\n
-  echo -e "${REV}Basic usage:${NORM} ${BOLD}$SCRIPT tql${NORM}"\\n
+  echo -e "${REV}Basic usage:${NORM} ${BOLD}$SCRIPT -o <output-file> -i <input-file> -q <query>${NORM}"\\n
   echo -e "The following arguments are required"\\n
   echo -e "${REV}-q${NORM}  --Sets the query for the job"\\n
   echo -e "${REV}-o${NORM}  --Sets the output file for the job, this will be in TSV form"\\n
