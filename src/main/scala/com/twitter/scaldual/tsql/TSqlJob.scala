@@ -15,19 +15,29 @@ import com.twitter.scaldual.core._
 */
 class TSqlJob(args:Args) extends LingualJob(args){
   val delim = args.optional("delim").getOrElse("\t")
-  val input  = args("input")
+  val inputs  = args.list("input")
 
-  val line = TypedPsv[String](input).toIterator
+  if(inputs.size == 0)
+    sys.error("Must give at least one file")
 
-  if(!line.hasNext)
-    sys.error("Given empty file")
+  inputs.zipWithIndex.foreach{case(input, index) =>
+    val line = TypedPsv[String](input).toIterator
 
-  val firstLine = line.next()
-    
-  val columns = firstLine.split(delim).size  
-  val columnNames = 0.to(columns-1).map(v => Character.toUpperCase(Character.forDigit(v+10,36)).toString)
-  
-  table("FILE", Tsv(input, fields = new Fields(columnNames:_*)))
+    if(!line.hasNext)
+      sys.error("Given empty file")
+
+    val firstLine = line.next()
+
+    val columns = firstLine.split(delim).size
+    val columnNames = 0.to(columns-1).map{v =>
+      val col = Character.toUpperCase(Character.forDigit(v+10,36)).toString
+      if(index == 0) col else col+index
+    }
+
+    val tableName = if(index == 0) "FILE" else s"FILE$index"
+
+    table(tableName, Tsv(input, fields = new Fields(columnNames:_*)))
+  }
 
   val outputFile = args("output")
   output(Tsv(outputFile))
