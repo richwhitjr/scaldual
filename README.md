@@ -3,7 +3,7 @@
 This library makes working with Lingual a bit easier by using Scalding to do some of the heavy lifting. 
 It abstracts away the need to work directly with Cascading and allows for one job to run both Scalding and Lingual.
 
-Some examples of how to use the library in the Tutorial directory.
+Some examples of how to use the library are in the Tutorial directory.
 
 ## Building
 There is a script (called sbt) in the root that loads the correct sbt version to build:
