@@ -10,7 +10,7 @@ There is a script (called sbt) in the root that loads the correct sbt version to
 
 1. ./sbt update (takes 2 minutes or more)
 2. ./sbt test
-3. ./sbt assembly (needed to make the jar used by the scald.rb script)
+3. ./sbt assembly (needed to make the jar used by the scripts)
 
 ## TSql
 Included in this project is a small CLI that allows for quick queries to be run on single text files in either hadoop or locally.
