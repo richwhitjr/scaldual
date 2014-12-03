@@ -53,3 +53,13 @@ Another option is output the first n rows at the end of a run. For example in th
 ```shell
 scripts/tsql -l -i src/main/resources/tutorial/docBOW.tsv -o /tmp/output.tsv -q "select count(A) as cnt from FILE" -n 1
 ```
+
+#### Multiple Files
+
+The tool also allows for multiple input files.
+You can do it by quoting and passing in a list of files to -i.  
+What happens then is each file after the first is appended with a index(for example File1 below) and the columns in that file get the index appended also.
+
+```shell
+tsql -l -i "src/main/resources/tutorial/docBOW.tsv src/main/resources/tutorial/docBOW.tsv" -o /tmp/output.tsv -q "select A, A1 from FILE, FILE1 where A = A1"
+```
