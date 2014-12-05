@@ -185,21 +185,6 @@ def get_dep_location(org, dep, version)
   end
 end
 
-libs = scala_libs(SCALA_VERSION).map { |l| get_dep_location("org.scala-lang", l, SCALA_VERSION) }
-lib_dirs = libs.map { |f| File.dirname(f) }
-
-FileUtils.mkdir_p(SCALA_LIB_DIR)
-
-libs.map! do |l|
-  if File.dirname(l) != SCALA_LIB_DIR
-    FileUtils.cp(l, SCALA_LIB_DIR)
-  end
-  "#{SCALA_LIB_DIR}/#{File.basename(l)}"
-end
-
-LIBCP= libs.join(":")
-
-COMPILE_CMD="java -cp #{LIBCP} -Dscala.home=#{SCALA_LIB_DIR} scala.tools.nsc.Main"
 
 HOST = OPTS[:host] || CONFIG["host"]
 
@@ -458,11 +443,27 @@ def needs_rebuild?
 end
 
 def build_job_jar
+  libs = scala_libs(SCALA_VERSION).map { |l| get_dep_location("org.scala-lang", l, SCALA_VERSION) }
+  lib_dirs = libs.map { |f| File.dirname(f) }
+
+  FileUtils.mkdir_p(SCALA_LIB_DIR)
+
+  libs.map! do |l|
+    if File.dirname(l) != SCALA_LIB_DIR
+      FileUtils.cp(l, SCALA_LIB_DIR)
+    end
+    "#{SCALA_LIB_DIR}/#{File.basename(l)}"
+  end
+
+  libcp=libs.join(":")
+
+  compile_cmd="java -cp #{libs.join(":")} -Dscala.home=#{SCALA_LIB_DIR} scala.tools.nsc.Main"
+
   $stderr.puts("compiling " + JOBFILE)
   FileUtils.mkdir_p(BUILDDIR)
-  classpath = (([LIBCP, JARPATH, MODULEJARPATHS, CLASSPATH].select { |s| s != "" }) + convert_dependencies_to_jars).flatten.join(":")
+  classpath = (([libcp, JARPATH, MODULEJARPATHS, CLASSPATH].select { |s| s != "" }) + convert_dependencies_to_jars).flatten.join(":")
   puts("#{file_type}c -classpath #{classpath} -d #{BUILDDIR} #{JOBFILE}")
-  unless system("#{COMPILE_CMD} -classpath #{classpath} -d #{BUILDDIR} #{JOBFILE}")
+  unless system("#{compile_cmd} -classpath #{classpath} -d #{BUILDDIR} #{JOBFILE}")
     puts "[SUGGESTION]: Try scald.rb --clean, you may have corrupt jars lying around"
     FileUtils.rm_f(rsync_stat_file(JOBJARPATH))
     FileUtils.rm_rf(BUILDDIR)

@@ -1,10 +1,4 @@
 #!/bin/bash
-
-# “a” and “arga” have optional arguments with default values.
-# “b” and “argb” have no arguments, acting as sort of a flag.
-# “c” and “argc” have required arguments.
-
-# set an initial value for the flag
 ARG_DELIM='\t'
 ARG_REDUCERS='20'
 ARG_HOST=''
