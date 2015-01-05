@@ -529,20 +529,15 @@ def local_cmd(mode)
 end
 
 SHELL_COMMAND =
-  if OPTS[:print_cp]
-    classpath = ([JARPATH, MODULEJARPATHS].select { |s| s != "" } + convert_dependencies_to_jars).flatten.join(":") + (is_file? ? ":#{JOBJARPATH}" : "") +
-                    ":" + CLASSPATH
-    "echo #{classpath}"
-  elsif OPTS[:hdfs]
-    if is_file?
-      "ssh -t -C #{HOST} #{hadoop_command}"
-    else
-      "ssh -t -C #{HOST} #{jar_mode_command}"
-    end
+  if OPTS[:hdfs]
+    exec_cmd = is_file? ? "#{hadoop_command}" : "#{jar_mode_command}"
+    tmp_cmd_file = "/tmp/scaldual.sh"
+    File.open(tmp_cmd_file, 'w') { |file| file.write(exec_cmd)}
+    "echo \"Connecting to #{HOST}\" && ssh -t -C #{HOST} bash -l < #{tmp_cmd_file}"   
   elsif OPTS[:hdfs_local]
-    local_cmd("--hdfs")
+    local_cmd("--hdfs", DEBUG)
   elsif OPTS[:local]
-    local_cmd("--local")
+    local_cmd("--local", DEBUG)
   elsif OPTS[:print]
     if is_file?
       "echo #{hadoop_command}"
@@ -550,6 +545,7 @@ SHELL_COMMAND =
       "echo #{jar_mode_command}"
     end
   else
+    Trollop::options
     Trollop::die "no mode set"
   end
 

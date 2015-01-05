@@ -46,7 +46,7 @@ Similar to Local but instead uploads a file to host machine and builds a hadoop 
 
 Count the number of lines.
 ```shell
-scripts/tsql -i /user/scaldual/docBOW.tsv -o /user/scaldual/output.tsv -q '"select count(A) as cnt from FILE"'
+scripts/tsql -i /user/scaldual/docBOW.tsv -o /user/scaldual/output.tsv -q "select count(A) as cnt from FILE"
 ```
 
 #### Head

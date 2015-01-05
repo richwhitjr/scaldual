@@ -37,12 +37,7 @@ object RegisteredTables {
 
     if(catalogs.size > 0){
       val tableMap = catalogs.map(_.tables).reduce(_ ++ _)
-      (tableNames &~ registered)
-        .flatMap{case(tableName) =>
-          tableMap
-            .get(tableName)
-            .map{case(lingualTable) => lingualTable.addToFlowDef(fd, m)}
-        }
+      (tableNames &~ registered).flatMap{tableName => tableMap.get(tableName).map(_.addToFlowDef(fd, m))}
     }
   }
 }

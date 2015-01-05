@@ -39,7 +39,7 @@ class TsqlTest extends Specification with Mockito {
       source(input, data).
       source(inputLine, dataLine).
       sink[(String, String)](Tsv("outputFile")){ outputBuffer =>
-        "correcly output data" in {
+        "correctly output data" in {
           outputBuffer.size must beEqualTo(3)
         }
       }.

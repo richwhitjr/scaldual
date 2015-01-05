@@ -37,7 +37,7 @@ class LingualTutorialTest extends Specification with Mockito {
       arg("output", "outputFile").
       source(input, data).
       sink[(String, Int)](Tsv("outputFile")){ outputBuffer =>
-        "correcly output data" in {
+        "correctly output data" in {
           outputBuffer.size must beEqualTo(3)
         }
       }.
