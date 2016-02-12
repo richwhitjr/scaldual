@@ -7,7 +7,7 @@ import AssemblyKeys._
 
 import scala.collection.JavaConverters._
 
-object ScadualBuild extends Build {
+object Build extends Build {
   val printDependencyClasspath = taskKey[Unit]("Prints location of the dependencies")
   
   val sharedSettings = Project.defaultSettings ++ net.virtualvoid.sbt.graph.Plugin.graphSettings ++ assemblySettings ++ Seq(
@@ -56,11 +56,11 @@ object ScadualBuild extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
       logLevel in assembly := Level.Warn,
       libraryDependencies ++= Seq(
-        "com.twitter" % "scalding-core_2.10" % "0.11.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
-        "com.twitter" % "scalding-repl_2.10" % "0.11.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
-        "com.twitter" % "scalding-commons_2.10" % "0.11.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
+        "com.twitter" % "scalding-core_2.10" % "0.15.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
+        "com.twitter" % "scalding-repl_2.10" % "0.15.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
+        "com.twitter" % "scalding-commons_2.10" % "0.15.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
         "xerces" % "xercesImpl" % "2.9.1",
-        "cascading" % "lingual-core" % "1.2.0" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
+        "cascading" % "lingual-core" % "1.2.1" exclude("org.slf4j", "slf4j-api") exclude("org.slf4j", "slf4j-log4j12"),
         "org.slf4j" % "slf4j-api" % "1.7.5",
         "org.slf4j" % "log4j-over-slf4j" % "1.7.5" % "provided"
       )

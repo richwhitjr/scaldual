@@ -25,7 +25,6 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
 import java.util.TimeZone
-import scala.collection.JavaConversions._
 
 trait HasDateRange {
   implicit def dateRange: DateRange
@@ -132,10 +131,10 @@ abstract class LingualJob(args:Args) extends Job(args) {
     }
 
     flows.foreach{flow =>
-      listeners.foreach { flow.addListener(_) }
-      stepListeners.foreach { flow.addStepListener(_) }
-      skipStrategy.foreach { flow.setFlowSkipStrategy(_) }
-      stepStrategy.foreach { flow.setFlowStepStrategy(_) }
+      listeners.foreach(flow.addListener)
+      stepListeners.foreach(flow.addStepListener)
+      skipStrategy.foreach(flow.setFlowSkipStrategy)
+      stepStrategy.foreach(flow.setFlowStepStrategy)
     }
 
     val cascade = new CascadeConnector().connect(flows: _*)

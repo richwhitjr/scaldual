@@ -13,20 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.twitter.scalding
+package com.twitter.scaldual.core
+
+import java.io.File
 
 import cascading.tap.Tap
-import java.io.File
-import org.apache.hadoop.fs.{ Path, FileSystem }
+import com.twitter.scalding._
+import org.apache.hadoop.fs.{FileSystem, Path}
 
-/**
- * User: rwhitcomb
- * Date: 8/8/14
- * Time: 3:30 PM
- */
+import scala.language._
 
 object FileSourceExtensions {
-  implicit def fileSourceToExtendedFileSource(fs: FileSource) = new FileSourceExtensions(fs)
+  implicit def fileSourceToExtendedFileSource(fs: FileSource): FileSourceExtensions = new FileSourceExtensions(fs)
 }
 
 class FileSourceExtensions(val fs: FileSource) {
@@ -38,8 +36,8 @@ class FileSourceExtensions(val fs: FileSource) {
   def delete(implicit mode: Mode) {
     mode match {
       case Hdfs(_, jc) => fs.hdfsPaths.map(f => FileSystem.get(jc).delete(new Path(f), true))
-      case Local(_) => new File(fs.localPath).delete()
-      case Test(_) => true
+      case Local(_) => fs.localPaths.map(p => new File(p).delete())
+      case Test(_) => ()
       case _ => sys.error("Unable to delete the file")
     }
   }
