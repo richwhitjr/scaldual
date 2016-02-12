@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ARG_DELIM='\t'
 ARG_REDUCERS='20'
 ARG_HOST=''
@@ -29,6 +30,8 @@ function HELP {
   echo -e "${REV}-l${NORM}  --Sets if the option for this script to be run in local mode for scalding"\\n
   echo -e "${REV}-r${NORM}  --Sets the number of reducers"\\n
   echo -e "${REV}-n${NORM}  --Sets if we should output the first n lines to stdout"\\n
+  echo -e "${REV}-t${NORM}  --Sets the delim"\\n
+  echo -e "${REV}-d${NORM}  --Sets the time(date), needed if you want to use the catalog"\\n
   echo -e "${REV}-s${NORM}  --Sets the host for hdfs jobs"\\n
   echo -e "-----------------------------------"\\n
   echo -e "${REV}-h${NORM}  --Displays this help message. No further functions are performed."\\n
@@ -44,7 +47,7 @@ fi
 
 cmd=""
 
-while getopts :i:o:lr::n::q:s:d:h FLAG; do
+while getopts :i:o:lr::d::t::n::q:s:d:h FLAG; do
   case $FLAG in
     i)
       ARG_INPUT=$OPTARG
@@ -56,7 +59,7 @@ while getopts :i:o:lr::n::q:s:d:h FLAG; do
       ;;
     q)
       ARG_QUERY=$OPTARG
-      cmd="--query '"$OPTARG"' $cmd"
+      cmd="--query "\"$OPTARG\"" $cmd"
       ;;
     l)
       ARG_LOCAL=1
@@ -72,6 +75,10 @@ while getopts :i:o:lr::n::q:s:d:h FLAG; do
       cmd="--head '"$OPTARG"' $cmd"
       ;;
     d)
+      ARG_DATE=$OPTARG
+      cmd="--date $OPTARG $cmd"
+      ;;
+    t)
       ARG_DELIM=$OPTARG
       cmd="--delim $OPTARG $cmd"
       ;;
@@ -87,18 +94,18 @@ done
 
 shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 
-if [[ -z "$ARG_INPUT" ]] || [[ -z "$ARG_OUTPUT" ]] || [[ -z "$ARG_QUERY" ]] ; then
+if [[ -z "$ARG_OUTPUT" ]] || [[ -z "$ARG_QUERY" ]] ; then
   HELP;
 fi
 
 runner=""
 if [[ -z "$ARG_LOCAL" ]] ; then
   runner="$runner --hdfs"
-else  
+else
   runner="$runner --local"
 fi
 
-if [ -n "$ARG_HOST" ]; then 
+if [ -n "$ARG_HOST" ]; then
   runner="$runner --host $ARG_HOST"
 fi
 

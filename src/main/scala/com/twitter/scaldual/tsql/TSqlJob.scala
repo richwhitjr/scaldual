@@ -21,7 +21,7 @@ import com.twitter.scaldual.core._
 * The columns of FILE will be A-Z while FILE1 will be A1-Z1
 *
 * You can then write queries like "select A, A1 from FILE join FILE1 on FILE.B = FILE1.B1"
-* 
+*
 */
 class TSqlJob(args:Args) extends LingualJob(args){
   val delim = args.optional("delim").getOrElse("\t")

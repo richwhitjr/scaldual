@@ -42,8 +42,6 @@ scripts/tsql -l -i src/main/resources/tutorial/docBOW.tsv -o /tmp/output.tsv -q 
 
 Similar to Local but instead uploads a file to host machine and builds a hadoop command.  Here the output and input should be files on hdfs.
 
-*Notice the double quoting around the query in hadoop*
-
 Count the number of lines.
 ```shell
 scripts/tsql -i /user/scaldual/docBOW.tsv -o /user/scaldual/output.tsv -q "select count(A) as cnt from FILE"

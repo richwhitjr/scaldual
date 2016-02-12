@@ -535,9 +535,9 @@ SHELL_COMMAND =
     File.open(tmp_cmd_file, 'w') { |file| file.write(exec_cmd)}
     "echo \"Connecting to #{HOST}\" && ssh -t -C #{HOST} bash -l < #{tmp_cmd_file}"   
   elsif OPTS[:hdfs_local]
-    local_cmd("--hdfs", DEBUG)
+    local_cmd("--hdfs")
   elsif OPTS[:local]
-    local_cmd("--local", DEBUG)
+    local_cmd("--local")
   elsif OPTS[:print]
     if is_file?
       "echo #{hadoop_command}"
